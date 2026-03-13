@@ -194,7 +194,7 @@ html,body{width:100%;overflow-x:hidden;background:var(--bg);color:var(--w);font-
   <!-- LOGO REVEAL (shown after CONTROL) -->
   <div id="logo-reveal">
     <div id="logo-img-wrap">
-      <img id="logo-real" src="rata.png" alt="APEX logo" style="display:block">
+      <img id="logo-real" src="logo.png" alt="APEX logo" style="display:block">
       <div id="logo-placeholder" style="display:none">[ LOGO<br>APEX.PNG ]</div>
     </div>
   </div>
@@ -438,47 +438,28 @@ function erase(el, spd, cb) {
 // ── LOGO BUILD: pixel-row reveal + glitch ──
 function revealLogo(cb) {
   logoReveal.style.display = 'flex';
+  document.getElementById('logo-placeholder').style.display = 'none';
+  logoReal.style.display = 'block';
 
-  const useReal = true; // logo.png siempre activo
-  if (useReal) {
-    document.getElementById('logo-placeholder').style.display = 'none';
-    logoReal.style.display = 'block';
-  }
-
-  const wrap = logoWrap;
-  const totalRows = 55;
-  const rowH = 220 / totalRows; // px per row
-  let revealed = 0;
-
-  // Build a canvas-style reveal using box-shadow lines
-  wrap.style.position = 'relative';
-  const overlay = document.createElement('div');
-  overlay.style.cssText = `
-    position:absolute;inset:0;z-index:10;
-    background:var(--bg);
-    transition:none;
-  `;
-  wrap.appendChild(overlay);
-
-  // Reveal rows from top, staggered
-  function revealRow(row) {
-    if (row >= totalRows) {
-      // All rows revealed — trigger glitch
-      setTimeout(() => {
-        overlay.remove();
-        triggerLogoGlitch(cb);
-      }, 80);
-      return;
+  function startReveal() {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:absolute;inset:0;z-index:10;background:var(--bg);';
+    logoWrap.appendChild(overlay);
+    function revealRow(row) {
+      if (row >= 55) { setTimeout(() => { overlay.remove(); triggerLogoGlitch(cb); }, 80); return; }
+      overlay.style.clipPath = `inset(${((row/55)*100).toFixed(1)}% 0 0 0)`;
+      const skip = Math.random() < 0.2 ? 2 : 1;
+      setTimeout(() => revealRow(row + skip), 18 + Math.random() * 22);
     }
-    // Clip overlay to hide top `row` rows
-    const pct = ((row / totalRows) * 100).toFixed(1);
-    overlay.style.clipPath = `inset(${pct}% 0 0 0)`;
-
-    // Occasional skip for glitchy feel
-    const skip = Math.random() < 0.2 ? 2 : 1;
-    setTimeout(() => revealRow(row + skip), 18 + Math.random() * 22);
+    revealRow(0);
   }
-  revealRow(0);
+
+  if (logoReal.complete && logoReal.naturalWidth > 0) {
+    startReveal();
+  } else {
+    logoReal.onload  = startReveal;
+    logoReal.onerror = () => setTimeout(cb, 1500);
+  }
 }
 
 function triggerLogoGlitch(cb) {
