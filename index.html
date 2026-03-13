@@ -43,7 +43,7 @@ html,body{width:100%;overflow-x:hidden;background:var(--bg);color:var(--w);font-
 /* placeholder shown when no real image */
 #logo-placeholder{width:220px;height:220px;background:#111;border:1px solid #2a2a2a;display:flex;align-items:center;justify-content:center;font-family:var(--vt);font-size:14px;color:#333;letter-spacing:3px;text-align:center;line-height:1.6}
 /* real logo image — swap src to your file */
-#logo-real{width:220px;height:220px;object-fit:contain;display:none;opacity:0}
+#logo-real{width:220px;height:220px;object-fit:contain;display:none;opacity:1}
 /* glitch layers */
 #logo-img-wrap::before,#logo-img-wrap::after{content:'';position:absolute;inset:0;background:inherit;pointer-events:none}
 #logo-img-wrap.glitching::before{animation:lg1 .12s steps(1) 6}
