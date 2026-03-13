@@ -438,20 +438,29 @@ function erase(el, spd, cb) {
 // ── LOGO BUILD: pixel-row reveal + glitch ──
 function revealLogo(cb) {
   logoReveal.style.display = 'flex';
-  document.getElementById('logo-placeholder').style.display = 'none';
   logoReal.style.display = 'block';
+  document.getElementById('logo-placeholder').style.display = 'none';
 
   function startReveal() {
+    // Simple height-based reveal: overlay shrinks from full to 0
     const overlay = document.createElement('div');
-    overlay.style.cssText = 'position:absolute;inset:0;z-index:10;background:var(--bg);';
+    overlay.style.cssText = 'position:absolute;left:0;right:0;bottom:0;z-index:10;background:#060606;height:100%;transition:none;';
     logoWrap.appendChild(overlay);
-    function revealRow(row) {
-      if (row >= 55) { setTimeout(() => { overlay.remove(); triggerLogoGlitch(cb); }, 80); return; }
-      overlay.style.clipPath = `inset(${((row/55)*100).toFixed(1)}% 0 0 0)`;
-      const skip = Math.random() < 0.2 ? 2 : 1;
-      setTimeout(() => revealRow(row + skip), 18 + Math.random() * 22);
+
+    let pct = 100;
+    function step() {
+      if (pct <= 0) {
+        overlay.remove();
+        triggerLogoGlitch(cb);
+        return;
+      }
+      // Occasional stutter for glitch feel
+      const dec = Math.random() < 0.15 ? 0 : (Math.random() < 0.1 ? 4 : 2);
+      pct = Math.max(0, pct - dec);
+      overlay.style.height = pct + '%';
+      setTimeout(step, 20 + Math.random() * 25);
     }
-    revealRow(0);
+    step();
   }
 
   if (logoReal.complete && logoReal.naturalWidth > 0) {
